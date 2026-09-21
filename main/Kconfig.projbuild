@@ -1,0 +1,31 @@
+menu "Bat-Sinal Configuration"
+
+    config BAT_WIFI_SSID
+        string "WiFi SSID"
+        default ""
+        help
+            SSID of the lab Wi-Fi network (STA mode).
+
+    config BAT_WIFI_PASSWORD
+        string "WiFi password"
+        default ""
+        help
+            Password of the lab Wi-Fi network. Prefer setting this in a local
+            sdkconfig (gitignored), not in sdkconfig.defaults.
+
+    config BAT_MQTT_BROKER_URI
+        string "MQTT broker URI"
+        default "mqtt://10.1.133.82:1883"
+        help
+            Mosquitto broker used by the Gotham Bat-Sinal contract.
+
+    config BAT_LED_GPIO
+        int "LED GPIO number"
+        range 0 48
+        default 8
+        help
+            GPIO driving the Bat-Sinal LED (active high). Default 8 is the
+            onboard LED on ESP32-C6 DevKit. For an external LED: GPIO -> 220 ohm
+            -> LED anode, cathode to GND.
+
+endmenu
