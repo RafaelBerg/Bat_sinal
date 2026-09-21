@@ -57,6 +57,10 @@ void mqtt_app_start(mqtt_app_data_cb_t on_data)
     };
 
     s_client = esp_mqtt_client_init(&mqtt_cfg);
+    if (s_client == NULL) {
+        ESP_LOGE(TAG, "esp_mqtt_client_init failed (check broker URI)");
+        abort();
+    }
     ESP_ERROR_CHECK(esp_mqtt_client_register_event(s_client, ESP_EVENT_ANY_ID,
                                                    mqtt_event_handler, NULL));
     ESP_ERROR_CHECK(esp_mqtt_client_start(s_client));

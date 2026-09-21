@@ -71,6 +71,9 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 
+# Machine-specific ESP-IDF extension path (rewritten by Select Current ESP-IDF Version)
+# Keep the rest of .vscode/settings.json in git; do not commit sdkconfig.
+
 # User-specific configuration files
 *.user
 *.workspace # General workspace files, can be from various tools

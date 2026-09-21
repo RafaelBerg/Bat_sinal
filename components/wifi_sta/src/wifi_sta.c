@@ -1,5 +1,7 @@
 #include "wifi_sta.h"
 
+#include <string.h>
+
 #include "esp_event.h"
 #include "esp_log.h"
 #include "esp_netif.h"
@@ -49,6 +51,9 @@ void wifi_sta_start(void)
     strlcpy((char *)wifi_config.sta.ssid, CONFIG_BAT_WIFI_SSID, sizeof(wifi_config.sta.ssid));
     strlcpy((char *)wifi_config.sta.password, CONFIG_BAT_WIFI_PASSWORD, sizeof(wifi_config.sta.password));
     wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
+    wifi_config.sta.sae_pwe_h2e = WPA3_SAE_PWE_BOTH;
+    wifi_config.sta.pmf_cfg.capable = true;
+    wifi_config.sta.pmf_cfg.required = false;
 
     if (CONFIG_BAT_WIFI_SSID[0] == '\0') {
         ESP_LOGW(TAG, "Wi-Fi SSID is empty. Set it with idf.py menuconfig (Bat-Sinal Configuration).");

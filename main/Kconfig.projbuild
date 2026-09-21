@@ -5,6 +5,7 @@ menu "Bat-Sinal Configuration"
         default ""
         help
             SSID of the lab Wi-Fi network (STA mode).
+            Required after git clone — set via SDK Configuration Editor (Menuconfig).
 
     config BAT_WIFI_PASSWORD
         string "WiFi password"
@@ -22,10 +23,9 @@ menu "Bat-Sinal Configuration"
     config BAT_LED_GPIO
         int "LED GPIO number"
         range 0 48
-        default 8
+        default 10
         help
-            GPIO driving the Bat-Sinal LED (active high). Default 8 is the
-            onboard LED on ESP32-C6 DevKit. For an external LED: GPIO -> 220 ohm
-            -> LED anode, cathode to GND.
+            GPIO driving the Bat-Sinal LED (active high). Default 10 for
+            external LED on ESP32-S3: GPIO -> 220 ohm -> LED anode, cathode GND.
 
 endmenu
