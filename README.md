@@ -1,91 +1,89 @@
-# Bat-Sinal — Node B (farol)
+# Bat-Sinal — Node B (Rooftop Actuator)
 
-Este repositório é só o **Node B**: o ESP32-S3 que acende o LED. Os dois nós falam pelo Mosquitto do laboratório (`mqtt://10.1.133.82:1883`). O roteiro está em `docs/`.
-
-O **Node A** (botão, quem publica o alerta) é o projeto do Caio:
-
-https://github.com/caiodantass/IOT-Controle-de-iluminacao
-
-Firmware do botão na branch [`bat-button`](https://github.com/caiodantass/IOT-Controle-de-iluminacao/tree/bat-button).
-
-| Nó | Placa | Função |
-|----|--------|--------|
-| A — [IOT-Controle-de-iluminacao](https://github.com/caiodantass/IOT-Controle-de-iluminacao/tree/bat-button) | ESP32-S3 + botão no GPIO 4 (outro lado em GND) | Publica `BAT_SIGNAL_ON` / `BAT_SIGNAL_OFF` |
-| B — este repositório | ESP32-S3 + LED | Inscreve no tópico e acende ou apaga o LED |
-
-## Contrato MQTT
-
-Tópico de comando: `gotham/dpgc/berg_caio/batsignal`
-
-- `BAT_SIGNAL_ON` → LED em nível alto. Log: `[ALERTA] Bat-Sinal Ativado! O Cavaleiro das Trevas foi convocado.`
-- `BAT_SIGNAL_OFF` → LED em nível baixo. Log: `[INFO] Bat-Sinal Desativado.`
-
-Heartbeat a cada 30 s em `gotham/dpgc/status`:
-
-```text
-{"device": "bat_sinal", "status": "ONLINE", "uptime_s": 120}
-```
-
-O Node A envia o mesmo formato com `"device": "bat_button"`.
+ESP-IDF firmware for the Bat-Sinal LED on **ESP32-S3**. Connects to lab Wi-Fi, subscribes to Mosquitto, and drives a GPIO LED.
 
 ## Layout
 
 ```text
-main/app_main.c              # boot: NVS, LED, Wi-Fi, MQTT, heartbeat
-components/gotham_protocol/  # tópicos e payloads
-components/wifi_sta/         # Wi-Fi station
-components/mqtt_app/         # cliente MQTT (subscribe + publish)
-components/bat_led/          # GPIO do LED
-components/heartbeat/        # status a cada 30 s
-docs/                        # roteiro
+main/app_main.c                 # boot: NVS, LED, Wi-Fi, MQTT, heartbeat
+components/gotham_protocol/     # MQTT topics and payloads
+components/wifi_sta/              # Wi-Fi station
+components/mqtt_app/            # esp-mqtt client (subscribe + publish)
+components/bat_led/             # GPIO LED actuator
+components/heartbeat/           # 30s status on gotham/dpgc/status
+docs/                           # assignment
 ```
 
-## Clonar no laboratório
+## Clone on another PC (lab)
 
-Clonar num caminho **sem acento** e abrir com o ambiente do ESP-IDF. Um `cmd` comum não acha o `idf.py`.
+Yes — clone. Do **not** use a random CMD. Clone into a path **without accents** and open it with the **ESP-IDF environment**.
 
 ```text
 cd C:\esp
-git clone <URL-deste-repo> Bat-Sinal
+git clone <URL-do-repo> Bat-Sinal
 ```
 
-1. **Cursor / VS Code.** File → Open Folder → `C:\esp\Bat-Sinal`. `Ctrl+Shift+P` → **ESP-IDF: Select Current ESP-IDF Version** (o IDF daquele PC). Se ainda não estiver instalado: **ESP-IDF: Open ESP-IDF Installation Manager**. Depois **ESP-IDF: SDK Configuration Editor (Menuconfig)**. No Windows essa janela é o menuconfig.
-2. **ESP-IDF PowerShell** (atalho do instalador da Espressif):
+Then **one** of these:
 
-```text
-cd C:\esp\Bat-Sinal
-idf.py set-target esp32s3
-idf.py menuconfig
-```
+1. **Cursor / VS Code (recommended)**  
+   File → Open Folder → `C:\esp\Bat-Sinal`  
+   `Ctrl+Shift+P` → **ESP-IDF: Select Current ESP-IDF Version** (pick the IDF **on that PC**)  
+   If the IDF is not installed there yet: **ESP-IDF: Open ESP-IDF Installation Manager**  
+   `Ctrl+Shift+P` → **ESP-IDF: SDK Configuration Editor (Menuconfig)**  
+   That GUI **is** menuconfig on Windows. The old black Linux TUI often does not open in `cmd.exe`.
 
-Em **Bat-Sinal Configuration**, preencher SSID e senha. Isso grava o `sdkconfig` local (não vai no git). Sem isso o build sobe com SSID vazio e a placa não conecta.
+2. **ESP-IDF PowerShell / ESP-IDF CMD** (shortcut created by the Espressif installer)  
+   ```text
+   cd C:\esp\Bat-Sinal
+   idf.py set-target esp32s3
+   idf.py menuconfig
+   ```
+
+In **Bat-Sinal Configuration** set WiFi SSID and password. Save. That writes local `sdkconfig` (gitignored).
 
 ```text
 idf.py build
 idf.py -p PORT flash monitor
 ```
 
-| Configuração | Valor |
-|--------------|--------|
-| Alvo | ESP32-S3 |
-| LED | GPIO **10**, ativo em alto |
-| Broker | `mqtt://10.1.133.82:1883` |
-| Flash | 8 MB, partição large app |
+Do **not** skip menuconfig: Wi-Fi is not in git. Build alone leaves SSID empty and the board will not connect.
 
-Hardware: **GPIO 10 → 220 Ω → anodo do LED**, catodo no GND.
+### Defaults already in the repo
 
-## Teste sem o botão
+| Setting | Value |
+|---------|--------|
+| Target | ESP32-S3 |
+| LED GPIO | **10** |
+| MQTT broker | `mqtt://10.1.133.82:1883` |
+| Flash | 8 MB, large app partition |
+
+Hardware: **GPIO 10 → 220 Ω → LED anode**, cathode to GND. Active high.
+
+## MQTT contract
+
+- Command topic: `gotham/dpgc/batsignal`
+  - `BAT_SIGNAL_ON` → LED high
+  - `BAT_SIGNAL_OFF` → LED low
+- Heartbeat every 30s on `gotham/dpgc/status`:
+  `{"device": "bat_sinal", "status": "ONLINE", "uptime_s": 120}`
+
+## Troubleshooting
+
+**Builds but nothing works on the board**
+
+1. Wrong chip — must be `idf.py set-target esp32s3` (not esp32c6).
+2. Wi-Fi empty — check monitor for `Wi-Fi SSID vazio!` and run `menuconfig`.
+3. LED on wrong pin — default is GPIO **10**; change in menuconfig if wired elsewhere.
+4. Not on lab Wi-Fi / broker unreachable — MQTT never connects.
+
+**Windows path with accents** (e.g. `Área de Trabalho`)
+
+Clone or copy the project to a plain path such as `C:\esp\Bat-Sinal` before building.
+
+## Test without the button node
 
 ```text
-mosquitto_pub -h 10.1.133.82 -t gotham/dpgc/berg_caio/batsignal -m "BAT_SIGNAL_ON"
-mosquitto_pub -h 10.1.133.82 -t gotham/dpgc/berg_caio/batsignal -m "BAT_SIGNAL_OFF"
+mosquitto_pub -h 10.1.133.82 -t gotham/dpgc/batsignal -m "BAT_SIGNAL_ON"
+mosquitto_pub -h 10.1.133.82 -t gotham/dpgc/batsignal -m "BAT_SIGNAL_OFF"
 mosquitto_sub -h 10.1.133.82 -t "gotham/dpgc/#" -v
 ```
-
-## Se compilou e a placa não responde
-
-1. Alvo errado: `idf.py set-target esp32s3`.
-2. Wi-Fi vazio: o monitor mostra `Wi-Fi SSID vazio!`. Rodar o menuconfig.
-3. LED noutro pino: o padrão é o GPIO 10. Trocar em **Bat-Sinal Configuration**.
-4. Fora do Wi-Fi do laboratório, ou broker inacessível: o MQTT não conecta.
-5. Caminho com acento (por exemplo `Área de Trabalho`): copiar o projeto para `C:\esp\Bat-Sinal` antes de compilar.

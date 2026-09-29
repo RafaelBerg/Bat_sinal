@@ -16,7 +16,7 @@ menu "Bat-Sinal Configuration"
 
     config BAT_MQTT_BROKER_URI
         string "MQTT broker URI"
-        default "mqtt://10.1.133.82:1883"
+        default "mqtt://192.168.1.107:1883"
         help
             Mosquitto broker used by the Gotham Bat-Sinal contract.
 
