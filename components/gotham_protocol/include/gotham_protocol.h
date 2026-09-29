@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define GOTHAM_TOPIC_SIGNAL "gotham/dpgc/batsignal"
+#define GOTHAM_TOPIC_SIGNAL "gotham/dpgc/berg_caio/batsignal"
 #define GOTHAM_TOPIC_STATUS "gotham/dpgc/status"
 #define GOTHAM_MSG_SIGNAL_ON  "BAT_SIGNAL_ON"
 #define GOTHAM_MSG_SIGNAL_OFF "BAT_SIGNAL_OFF"
