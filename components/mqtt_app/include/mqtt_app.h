@@ -10,7 +10,7 @@ typedef void (*mqtt_app_data_cb_t)(const char *data, int len);
 
 void mqtt_app_start(mqtt_app_data_cb_t on_data);
 bool mqtt_app_is_connected(void);
-int mqtt_app_publish(const char *topic, const char *payload);
+int mqtt_app_publish(const char *topic, const char *payload, bool retain);
 
 #ifdef __cplusplus
 }

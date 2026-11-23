@@ -5,8 +5,11 @@
 
 #define GOTHAM_TOPIC_SIGNAL "gotham/dpgc/berg_caio/batsignal"
 #define GOTHAM_TOPIC_STATUS "gotham/dpgc/berg_caio/status"
+#define GOTHAM_TOPIC_AVAILABILITY "gotham/dpgc/berg_caio/availability/bat_sinal"
 #define GOTHAM_MSG_SIGNAL_ON  "BAT_SIGNAL_ON"
 #define GOTHAM_MSG_SIGNAL_OFF "BAT_SIGNAL_OFF"
+#define GOTHAM_MSG_ONLINE     "ONLINE"
+#define GOTHAM_MSG_OFFLINE    "OFFLINE"
 #define GOTHAM_DEVICE_ID      "bat_sinal"
 #define GOTHAM_HEARTBEAT_MS   30000
 

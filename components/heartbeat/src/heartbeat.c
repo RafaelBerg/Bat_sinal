@@ -27,9 +27,10 @@ static void heartbeat_task(void *arg)
                  "{\"device\": \"%s\", \"status\": \"ONLINE\", \"uptime_s\": %lld}",
                  GOTHAM_DEVICE_ID, (long long)uptime_s);
 
-        if (mqtt_app_publish(GOTHAM_TOPIC_STATUS, payload) < 0) {
+        if (mqtt_app_publish(GOTHAM_TOPIC_STATUS, payload, false) < 0) {
             ESP_LOGW(TAG, "Heartbeat publish failed");
         } else {
+            mqtt_app_publish(GOTHAM_TOPIC_AVAILABILITY, GOTHAM_MSG_ONLINE, true);
             ESP_LOGI(TAG, "Heartbeat %s", payload);
         }
     }

@@ -1,6 +1,6 @@
 # Bat-Sinal — Node B (farol)
 
-Este repositório é só o **Node B**: o ESP32-S3 que acende o LED. Os dois nós falam pelo Mosquitto do laboratório (`mqtt://10.1.133.82:1883`). O roteiro está em `docs/`.
+Este repositório é só o **Node B**: o ESP32-S3 que acende o LED. Os dois nós falam pelo Mosquitto em `mqtt://192.168.1.107:1883`. O roteiro está em `docs/`.
 
 O **Node A** (botão, quem publica o alerta) é o projeto do Caio:
 
@@ -20,7 +20,7 @@ Tópico de comando: `gotham/dpgc/berg_caio/batsignal`
 - `BAT_SIGNAL_ON` → LED em nível alto. Log: `[ALERTA] Bat-Sinal Ativado! O Cavaleiro das Trevas foi convocado.`
 - `BAT_SIGNAL_OFF` → LED em nível baixo. Log: `[INFO] Bat-Sinal Desativado.`
 
-Heartbeat a cada 30 s em `gotham/dpgc/status`:
+Heartbeat a cada 30 s em `gotham/dpgc/berg_caio/status`. Presença em `gotham/dpgc/berg_caio/availability/bat_sinal` (`ONLINE`, Last Will `OFFLINE`):
 
 ```text
 {"device": "bat_sinal", "status": "ONLINE", "uptime_s": 120}
@@ -69,7 +69,7 @@ idf.py -p PORT flash monitor
 |--------------|--------|
 | Alvo | ESP32-S3 |
 | LED | GPIO **10**, ativo em alto |
-| Broker | `mqtt://10.1.133.82:1883` |
+| Broker | `mqtt://192.168.1.107:1883` |
 | Flash | 8 MB, partição large app |
 
 Hardware: **GPIO 10 → 220 Ω → anodo do LED**, catodo no GND.
@@ -77,9 +77,9 @@ Hardware: **GPIO 10 → 220 Ω → anodo do LED**, catodo no GND.
 ## Teste sem o botão
 
 ```text
-mosquitto_pub -h 10.1.133.82 -t gotham/dpgc/berg_caio/batsignal -m "BAT_SIGNAL_ON"
-mosquitto_pub -h 10.1.133.82 -t gotham/dpgc/berg_caio/batsignal -m "BAT_SIGNAL_OFF"
-mosquitto_sub -h 10.1.133.82 -t "gotham/dpgc/#" -v
+mosquitto_pub -h 192.168.1.107 -t gotham/dpgc/berg_caio/batsignal -m "BAT_SIGNAL_ON"
+mosquitto_pub -h 192.168.1.107 -t gotham/dpgc/berg_caio/batsignal -m "BAT_SIGNAL_OFF"
+mosquitto_sub -h 192.168.1.107 -t "gotham/dpgc/#" -v
 ```
 
 ## Se compilou e a placa não responde

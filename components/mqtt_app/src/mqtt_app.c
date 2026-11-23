@@ -21,7 +21,8 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base,
     case MQTT_EVENT_CONNECTED:
         s_connected = true;
         ESP_LOGI(TAG, "MQTT connected to %s", CONFIG_BAT_MQTT_BROKER_URI);
-        esp_mqtt_client_subscribe(event->client, GOTHAM_TOPIC_SIGNAL, 0);
+        esp_mqtt_client_publish(s_client, GOTHAM_TOPIC_AVAILABILITY, GOTHAM_MSG_ONLINE, 0, 1, 1);
+        esp_mqtt_client_subscribe(event->client, GOTHAM_TOPIC_SIGNAL, 1);
         ESP_LOGI(TAG, "Subscribed to %s", GOTHAM_TOPIC_SIGNAL);
         break;
 
@@ -54,6 +55,10 @@ void mqtt_app_start(mqtt_app_data_cb_t on_data)
 
     const esp_mqtt_client_config_t mqtt_cfg = {
         .broker.address.uri = CONFIG_BAT_MQTT_BROKER_URI,
+        .session.last_will.topic = GOTHAM_TOPIC_AVAILABILITY,
+        .session.last_will.msg = GOTHAM_MSG_OFFLINE,
+        .session.last_will.qos = 1,
+        .session.last_will.retain = 1,
     };
 
     s_client = esp_mqtt_client_init(&mqtt_cfg);
@@ -71,10 +76,10 @@ bool mqtt_app_is_connected(void)
     return s_connected && s_client != NULL;
 }
 
-int mqtt_app_publish(const char *topic, const char *payload)
+int mqtt_app_publish(const char *topic, const char *payload, bool retain)
 {
     if (!mqtt_app_is_connected()) {
         return -1;
     }
-    return esp_mqtt_client_publish(s_client, topic, payload, 0, 0, 0);
+    return esp_mqtt_client_publish(s_client, topic, payload, 0, 1, retain ? 1 : 0);
 }
